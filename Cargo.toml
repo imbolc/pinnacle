@@ -1,0 +1,12 @@
+[package]
+description = "Rust wrapper for Pinnacle Sports API"
+edition = "2021"
+license = "MIT"
+name = "pinnacle"
+repository = "https://github.com/imbolc/pinnacle"
+version = "0.1.0"
+
+[dependencies]
+
+[dev-dependencies]
+rusty-hook = "0.11"
