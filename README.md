@@ -8,6 +8,8 @@
 
 Rust Wrapper for Pinnacle Sports API
 
+The API is avalable at <https://pinnacleapi.github.io/>
+
 <!-- cargo-sync-readme end -->
 
 ## Contributing
