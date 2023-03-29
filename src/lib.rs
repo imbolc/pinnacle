@@ -20,7 +20,6 @@ const BALANCE_URL: &str = "https://api.pinnacle.com/v1/client/balance";
 pub struct Client {
     username: String,
     password: String,
-    base_url: String,
     client: reqwest::Client,
 }
 
@@ -29,19 +28,12 @@ impl Client {
     pub fn new(username: impl Into<String>, password: impl Into<String>) -> Self {
         let username = username.into();
         let password = password.into();
-        let base_url = "https://api.pinnacle.com/".into();
         let client = reqwest::Client::new();
         Self {
             username,
             password,
-            base_url,
             client,
         }
-    }
-
-    /// Changes the api base url
-    pub fn with_base_url(&mut self, url: impl Into<String>) {
-        self.base_url = url.into();
     }
 
     /// A general GET request
