@@ -33,9 +33,9 @@ pub struct Sport {
     pub event_count: i32,
 }
 
-/// Wrapper for the sports response
+/// Sports
 #[derive(Debug, Deserialize, Serialize)]
-pub struct SportsContainer {
+pub struct Sports {
     /// Sports
     pub sports: Vec<Sport>,
 }
@@ -64,9 +64,48 @@ pub struct League {
     pub event_count: i32,
 }
 
-/// Wrapper for the leagues response
+/// Leagues
 #[derive(Debug, Deserialize, Serialize)]
-pub struct LeaguesContainer {
+pub struct Leagues {
     /// Leagues
     pub leagues: Vec<League>,
+}
+
+/// Period
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Period {
+    /// Period Number
+    pub number: i32,
+    /// Description for the period
+    pub description: String,
+    /// Short description for the period
+    pub short_description: String,
+    /// Description for the Spread
+    pub spread_description: String,
+    /// Description for the Moneyline
+    pub moneyline_description: String,
+    /// Description for the Totals
+    pub total_description: String,
+    /// Description for Team1 Totals
+    pub team1_total_description: String,
+    /// Description for Team2 Totals
+    pub team2_total_description: String,
+    /// Short description for the Spread
+    pub spread_short_description: String,
+    /// Short description for the Moneyline
+    pub moneyline_short_description: String,
+    /// Short description for the Totals
+    pub total_short_description: String,
+    /// Short description for Team1 Totals
+    pub team1_total_short_description: String,
+    /// Short description for Team2 Totals
+    pub team2_total_short_description: String,
+}
+
+/// Periods
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Periods {
+    /// Periods
+    pub periods: Vec<Period>,
 }

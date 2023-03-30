@@ -22,6 +22,11 @@ enum Command {
         #[arg(short, long)]
         sport_id: i32,
     },
+    /// Periods in a particular sport
+    Periods {
+        #[arg(short, long)]
+        sport_id: i32,
+    },
 }
 
 #[tokio::main]
@@ -35,6 +40,9 @@ async fn main() -> anyhow::Result<()> {
         }
         Command::Leagues { sport_id } => {
             println!("{:#?}", client.get_sport_leagues(sport_id).await?)
+        }
+        Command::Periods { sport_id } => {
+            println!("{:#?}", client.get_sport_periods(sport_id).await?)
         }
     }
     Ok(())

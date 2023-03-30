@@ -51,16 +51,19 @@ impl Client {
     }
 
     /// Returns all sports with the status whether they currently have lines or not
-    pub async fn get_sports(&self) -> Result<Vec<types::Sport>> {
-        let types::SportsContainer { sports } =
-            self.get("https://api.pinnacle.com/v2/sports").await?;
-        Ok(sports)
+    pub async fn get_sports(&self) -> Result<types::Sports> {
+        self.get("https://api.pinnacle.com/v2/sports").await
     }
 
-    /// Returns all sports with the status whether they currently have lines or not
-    pub async fn get_sport_leagues(&self, sport_id: i32) -> Result<Vec<types::League>> {
+    /// Returns all sports leagues with the status whether they currently have lines or not
+    pub async fn get_sport_leagues(&self, sport_id: i32) -> Result<types::Leagues> {
         let url = format!("https://api.pinnacle.com/v2/leagues?sportId={sport_id}");
-        let types::LeaguesContainer { leagues } = self.get(url).await?;
-        Ok(leagues)
+        self.get(url).await
+    }
+
+    /// Returns all periods for a given sport
+    pub async fn get_sport_periods(&self, sport_id: i32) -> Result<types::Periods> {
+        let url = format!("https://api.pinnacle.com/v1/periods?sportId={sport_id}");
+        self.get(url).await
     }
 }
