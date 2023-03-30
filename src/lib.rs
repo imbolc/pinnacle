@@ -77,7 +77,7 @@ impl Client {
         let options = serde_urlencoded::to_string(options)
             .ok()
             .unwrap_or_default();
-        let url = format!("https://api.pinnacle.com/v1/periods?sportId={sport_id}&{options}",);
+        let url = format!("https://api.pinnacle.com/v1/odds?sportId={sport_id}&{options}",);
         self.get(url).await
     }
 }
