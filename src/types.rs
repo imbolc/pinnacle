@@ -130,15 +130,27 @@ pub enum OddsFormat {
 #[derive(Debug, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StraightOddsOptions {
+    /// The leagueIds array may contain a list of comma separated league ids
     #[serde(serialize_with = "util::serialize_comma_separated_option")]
-    league_ids: Option<Vec<i32>>,
-    odds_format: Option<OddsFormat>,
-    since: Option<i64>,
+    pub league_ids: Option<Vec<i32>>,
+    /// Format in which we return the odds. Default is American.
+    pub odds_format: Option<OddsFormat>,
+    /// This is used to receive incremental updates. Use the value of last from previous odds
+    /// response. When since parameter is not provided, the odds are delayed up to 1 min to
+    /// encourage the use of the parameter. Please note that when using since parameter you will
+    /// get in the response ONLY changed periods. If a period did not have any changes it will
+    /// not be in the response.
+    pub since: Option<i64>,
+    /// To retrieve ONLY live odds set the value to 1 (isLive=1).
+    /// Otherwise response will have all odds.
     #[serde(serialize_with = "util::serialize_bool_1_or_skip")]
-    is_live: bool,
+    pub is_live: bool,
+    /// Filter by EventIds
     #[serde(serialize_with = "util::serialize_comma_separated_option")]
-    event_ids: Option<Vec<i64>>,
-    to_currency_code: Option<String>,
+    pub event_ids: Option<Vec<i64>>,
+    /// 3 letter currency code as in the /currency response.
+    /// Limits will be returned in the requested currency. Default is USD.
+    pub to_currency_code: Option<String>,
 }
 
 #[cfg(test)]
