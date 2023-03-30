@@ -10,10 +10,7 @@ use reqwest::IntoUrl;
 pub use reqwest::{Error, Result};
 use serde::de::DeserializeOwned;
 
-mod types;
-pub use types::Balance;
-
-const BALANCE_URL: &str = "https://api.pinnacle.com/v1/client/balance";
+pub mod types;
 
 /// Pinnacle API client
 #[derive(Debug)]
@@ -49,7 +46,21 @@ impl Client {
     }
 
     /// Returns account balance
-    pub async fn get_balance(&self) -> Result<Balance> {
-        self.get(BALANCE_URL).await
+    pub async fn get_balance(&self) -> Result<types::Balance> {
+        self.get("https://api.pinnacle.com/v1/client/balance").await
+    }
+
+    /// Returns all sports with the status whether they currently have lines or not
+    pub async fn get_sports(&self) -> Result<Vec<types::Sport>> {
+        let types::SportsContainer { sports } =
+            self.get("https://api.pinnacle.com/v2/sports").await?;
+        Ok(sports)
+    }
+
+    /// Returns all sports with the status whether they currently have lines or not
+    pub async fn get_sport_leagues(&self, sport_id: i32) -> Result<Vec<types::League>> {
+        let url = format!("https://api.pinnacle.com/v2/leagues?sportId={sport_id}");
+        let types::LeaguesContainer { leagues } = self.get(url).await?;
+        Ok(leagues)
     }
 }

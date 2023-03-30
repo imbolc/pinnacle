@@ -11,4 +11,8 @@ reqwest = { version = "0.11", features = ["json"] }
 serde = { version = "1", features = ["serde_derive"] }
 
 [dev-dependencies]
+anyhow = "1.0.70"
+clap = { version = "4", features = ["derive", "env"] }
+dotenvy = "0.15"
 rusty-hook = "0.11"
+tokio = { version = "1", features = ["full"] }
