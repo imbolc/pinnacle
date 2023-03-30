@@ -11,6 +11,7 @@ pub use reqwest::{Error, Result};
 use serde::de::DeserializeOwned;
 
 pub mod types;
+mod util;
 
 /// Pinnacle API client
 #[derive(Debug)]
@@ -64,6 +65,19 @@ impl Client {
     /// Returns all periods for a given sport
     pub async fn get_sport_periods(&self, sport_id: i32) -> Result<types::Periods> {
         let url = format!("https://api.pinnacle.com/v1/periods?sportId={sport_id}");
+        self.get(url).await
+    }
+
+    /// Returns all periods for a given sport
+    pub async fn get_straight_odds<T: DeserializeOwned>(
+        &self,
+        sport_id: i32,
+        options: &types::StraightOddsOptions,
+    ) -> Result<T> {
+        let options = serde_urlencoded::to_string(options)
+            .ok()
+            .unwrap_or_default();
+        let url = format!("https://api.pinnacle.com/v1/periods?sportId={sport_id}&{options}",);
         self.get(url).await
     }
 }

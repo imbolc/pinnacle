@@ -1,4 +1,5 @@
 //! Typed responses
+use crate::util;
 use serde::{Deserialize, Serialize};
 
 /// Account balance
@@ -108,4 +109,63 @@ pub struct Period {
 pub struct Periods {
     /// Periods
     pub periods: Vec<Period>,
+}
+
+/// Format in which we return the odds
+#[derive(Debug, Deserialize, Serialize)]
+pub enum OddsFormat {
+    /// American
+    American,
+    /// Decimal
+    Decimal,
+    /// HongKong
+    HongKong,
+    /// Indonesian
+    Indonesian,
+    /// Malay
+    Malay,
+}
+
+/// Straight Odds query params
+#[derive(Debug, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct StraightOddsOptions {
+    #[serde(serialize_with = "util::serialize_comma_separated_option")]
+    league_ids: Option<Vec<i32>>,
+    odds_format: Option<OddsFormat>,
+    since: Option<i64>,
+    #[serde(serialize_with = "util::serialize_bool_1_or_skip")]
+    is_live: bool,
+    #[serde(serialize_with = "util::serialize_comma_separated_option")]
+    event_ids: Option<Vec<i64>>,
+    to_currency_code: Option<String>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_straight_odds_query() {
+        use serde_urlencoded::to_string as qs;
+
+        assert_eq!(qs(&StraightOddsOptions::default()).unwrap(), "");
+        assert_eq!(
+            qs(&StraightOddsOptions {
+                is_live: true,
+                ..Default::default()
+            })
+            .unwrap(),
+            "isLive=1"
+        );
+        assert_eq!(
+            qs(&StraightOddsOptions {
+                league_ids: Some(vec![1, 2]),
+                odds_format: Some(OddsFormat::Decimal),
+                ..Default::default()
+            })
+            .unwrap(),
+            "leagueIds=1%2C2&oddsFormat=Decimal"
+        );
+    }
 }
