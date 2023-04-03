@@ -7,8 +7,8 @@
 #![warn(clippy::all, missing_docs, nonstandard_style, future_incompatible)]
 
 use reqwest::IntoUrl;
-pub use reqwest::{Error, Result};
 use serde::de::DeserializeOwned;
+use std::result::Result as StdResult;
 
 pub mod types;
 mod util;
@@ -20,6 +20,24 @@ pub struct Client {
     password: String,
     client: reqwest::Client,
 }
+
+/// Errors
+#[derive(Debug, displaydoc::Display, thiserror::Error)]
+pub enum Error {
+    /// reqwest
+    Reqwest(#[from] reqwest::Error),
+    /// empty json from {0}
+    EmptyJson(reqwest::Url),
+    /// decode json from {1}
+    DecodeJson(
+        #[source] serde_path_to_error::Error<serde_json::Error>,
+        reqwest::Url,
+    ),
+}
+
+/// Result
+pub type Result<T> = StdResult<T, Error>;
+type DeserializeJsonError = serde_path_to_error::Error<serde_json::Error>;
 
 impl Client {
     /// Creates a new client
@@ -36,14 +54,20 @@ impl Client {
 
     /// A general GET request
     pub async fn get<U: IntoUrl, T: DeserializeOwned>(&self, url: U) -> Result<T> {
-        self.client
-            .get(url)
+        let url = url.into_url()?;
+        let text = self
+            .client
+            .get(url.clone())
             .basic_auth(&self.username, Some(&self.password))
             .send()
             .await?
             .error_for_status()?
-            .json()
-            .await
+            .text()
+            .await?;
+        if text.is_empty() {
+            return Err(Error::EmptyJson(url));
+        }
+        parse_json(&text).map_err(|e| Error::DecodeJson(e, url))
     }
 
     /// Returns account balance
@@ -69,15 +93,20 @@ impl Client {
     }
 
     /// Returns all periods for a given sport
-    pub async fn get_straight_odds<T: DeserializeOwned>(
+    /// Usage: `client.get_straight_odds(&StraightOddsRequest {sport_id: 29, ..Default::default()}).await?`
+    pub async fn get_straight_odds(
         &self,
-        sport_id: i32,
-        options: &types::StraightOddsOptions,
-    ) -> Result<T> {
-        let options = serde_urlencoded::to_string(options)
+        request: &types::StraightOddsRequest,
+    ) -> Result<types::OddsResponse> {
+        let qs = serde_urlencoded::to_string(request)
             .ok()
             .unwrap_or_default();
-        let url = format!("https://api.pinnacle.com/v1/odds?sportId={sport_id}&{options}",);
+        let url = format!("https://api.pinnacle.com/v1/odds?{qs}");
         self.get(url).await
     }
+}
+
+fn parse_json<T: DeserializeOwned>(json: &str) -> StdResult<T, DeserializeJsonError> {
+    let jd = &mut serde_json::Deserializer::from_str(json);
+    serde_path_to_error::deserialize(jd)
 }

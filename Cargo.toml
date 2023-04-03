@@ -7,12 +7,17 @@ repository = "https://github.com/imbolc/pinnacle"
 version = "0.1.0"
 
 [dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+displaydoc = "0.2"
 reqwest = { version = "0.11", features = ["json"] }
 serde = { version = "1", features = ["serde_derive"] }
-serde_urlencoded = "0.7.1"
+serde_json = "1"
+serde_path_to_error = "0.1"
+serde_urlencoded = "0.7"
+thiserror = "1"
 
 [dev-dependencies]
-anyhow = "1.0.70"
+anyhow = "1"
 clap = { version = "4", features = ["derive", "env"] }
 dotenvy = "0.15"
 rusty-hook = "0.11"

@@ -1,5 +1,6 @@
 //! Typed responses
 use crate::util;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 /// Account balance
@@ -49,7 +50,8 @@ pub struct League {
     pub id: i32,
     /// Name of the league
     pub name: String,
-    /// Specifies whether the home team is team1 or team2. You need this information to place a bet.
+    /// Specifies whether the home team is team1 or team2. You need this information to place a
+    /// bet.
     pub home_team_type: String,
     /// Whether the league currently has events or specials
     pub has_offerings: bool,
@@ -126,10 +128,12 @@ pub enum OddsFormat {
     Malay,
 }
 
-/// Straight Odds query params
+/// Straight Odds request params
 #[derive(Debug, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct StraightOddsOptions {
+pub struct StraightOddsRequest {
+    /// The sportid for which to retrieve the odds.
+    pub sport_id: i32,
     /// The leagueIds array may contain a list of comma separated league ids
     #[serde(serialize_with = "util::serialize_comma_separated_option")]
     pub league_ids: Option<Vec<i32>>,
@@ -153,6 +157,169 @@ pub struct StraightOddsOptions {
     pub to_currency_code: Option<String>,
 }
 
+/// Odds Response
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OddsResponse {
+    /// Same as requested sport Id.
+    pub sport_id: i32,
+    /// Use this value for the subsequent requests for since query parameter to get just the
+    /// changes since the previous response.
+    pub last: i64,
+    /// Contains a list of Leagues.
+    pub leagues: Vec<OddsLeague>,
+}
+
+/// Odds League
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OddsLeague {
+    /// League Id.
+    pub id: i32,
+    /// Contains a list of events.
+    pub events: Vec<OddsEvent>,
+}
+
+/// Odds Event
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OddsEvent {
+    /// Event Id.
+    pub id: i64,
+    /// Away team score. Only for live soccer events. Supported only for full match period
+    /// (number=0).
+    pub away_score: Option<f64>,
+    /// Home team score. Only for live soccer events. Supported only for full match period
+    /// (number=0).
+    pub home_score: Option<f64>,
+    /// Away team red cards. Only for live soccer events. Supported only for full match period
+    /// (number=0).
+    pub away_red_cards: Option<i32>,
+    /// Home team red cards. Only for live soccer events. Supported only for full match period
+    /// (number=0).
+    pub home_red_cards: Option<i32>,
+    /// Contains a list of periods.
+    pub periods: Vec<OddsPeriod>,
+}
+
+/// Odds Period
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OddsPeriod {
+    /// Line Id.
+    pub line_id: i64,
+    /// This represents the period of the match.
+    pub number: i32,
+    /// Period’s wagering cut-off date in UTC.
+    pub cutoff: DateTime<Utc>,
+    /// 1 - online, period is open for betting. 2 - offline, period is not open for betting.
+    pub status: i32,
+    /// Maximum spread bet volume. See [How to calculate max risk from the max volume](https://github.com/pinnacleapi/pinnacleapi-documentation/blob/master/FAQ.md#how-to-calculate-max-risk-from-the-max-volume-limits-in-odds)
+    pub max_spread: Option<f64>,
+    /// Maximum moneyline bet volume. See [How to calculate max risk from the max volume](https://github.com/pinnacleapi/pinnacleapi-documentation/blob/master/FAQ.md#how-to-calculate-max-risk-from-the-max-volume-limits-in-odds)
+    pub max_moneyline: Option<f64>,
+    /// Maximum total points bet volume. See [How to calculate max risk from the max volume](https://github.com/pinnacleapi/pinnacleapi-documentation/blob/master/FAQ.md#how-to-calculate-max-risk-from-the-max-volume-limits-in-odds)
+    pub max_total: Option<f64>,
+    /// Maximum team total points bet volume. See [How to calculate max risk from the max volume](https://github.com/pinnacleapi/pinnacleapi-documentation/blob/master/FAQ.md#how-to-calculate-max-risk-from-the-max-volume-limits-in-odds)
+    pub max_team_total: Option<f64>,
+    /// Date time of the last moneyline update.
+    pub moneyline_updated_at: Option<DateTime<Utc>>,
+    /// Date time of the last spread update.
+    pub spread_updated_at: Option<DateTime<Utc>>,
+    /// Date time of the last total update.
+    pub total_updated_at: Option<DateTime<Utc>>,
+    /// Date time of the last team total update.
+    pub team_total_updated_at: Option<DateTime<Utc>>,
+    /// Container for spread odds.
+    pub spreads: Option<Vec<OddsSpread>>,
+    /// Moneyline odds.
+    pub moneyline: Option<OddsMoneyline>,
+    /// Container for team total points.
+    pub totals: Option<Vec<OddsTotal>>,
+    /// Team total points odds.
+    pub team_total: Option<OddsTeamTotals>,
+    /// Period away team score. Only for live soccer events. Supported only for Match (number=0)
+    /// and Extra Time (number=3).
+    pub away_score: Option<f64>,
+    /// Period home team score. Only for live soccer events. Supported only for Match (number=0)
+    /// and Extra Time (number=3).
+    pub home_score: Option<f64>,
+    /// Period away team red cards. Only for live soccer events. Supported only for Match
+    /// (number=0) and Extra Time (number=3).
+    pub away_red_cards: Option<i32>,
+    /// Period home team red cards. Only for live soccer events. Supported only for Match
+    /// (number=0) and Extra Time (number=3).
+    pub home_red_cards: Option<i32>,
+}
+
+/// Odds Spread
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OddsSpread {
+    /// This is present only if it's an alternative line.
+    pub alt_line_id: Option<i64>,
+    /// Home team handicap.
+    pub hdp: f64,
+    /// Home team price.
+    pub home: f64,
+    /// Away team price.
+    pub away: f64,
+    /// Maximum bet volume. Present only on alternative lines, if set it overides `maxSpread`
+    /// market limit.
+    pub max: Option<f64>,
+}
+
+/// Odds Moneyline
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OddsMoneyline {
+    /// Away team price.
+    pub home: f64,
+    /// Away team price.
+    pub away: f64,
+    /// Draw price. This is present only for events we offer price for draw.
+    pub draw: Option<f64>,
+}
+
+/// Odds Total
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OddsTotal {
+    /// This is present only if it’s an alternative line.
+    pub alt_line_id: Option<i64>,
+    /// Total points.
+    pub points: f64,
+    /// Over price.
+    pub over: f64,
+    /// Under price.
+    pub under: f64,
+    /// Maximum bet volume. Present only on alternative lines, if set it overrides `maxTotal`
+    /// market limit.
+    pub max: Option<f64>,
+}
+
+/// Odds Team Totals
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OddsTeamTotals {
+    /// Home team total points, over and under prices.
+    pub home: Option<OddsTeamTotal>,
+    /// Away team total points, over and under prices.
+    pub away: Option<OddsTeamTotal>,
+}
+
+/// Odds Team Total
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OddsTeamTotal {
+    /// Total points.
+    pub points: f64,
+    /// Over price.
+    pub over: f64,
+    /// Under price.
+    pub under: f64,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -161,23 +328,23 @@ mod tests {
     fn test_straight_odds_query() {
         use serde_urlencoded::to_string as qs;
 
-        assert_eq!(qs(&StraightOddsOptions::default()).unwrap(), "");
+        assert_eq!(qs(&StraightOddsRequest::default()).unwrap(), "sportId=0");
         assert_eq!(
-            qs(&StraightOddsOptions {
+            qs(&StraightOddsRequest {
                 is_live: true,
                 ..Default::default()
             })
             .unwrap(),
-            "isLive=1"
+            "sportId=0&isLive=1"
         );
         assert_eq!(
-            qs(&StraightOddsOptions {
+            qs(&StraightOddsRequest {
                 league_ids: Some(vec![1, 2]),
                 odds_format: Some(OddsFormat::Decimal),
                 ..Default::default()
             })
             .unwrap(),
-            "leagueIds=1%2C2&oddsFormat=Decimal"
+            "sportId=0&leagueIds=1%2C2&oddsFormat=Decimal"
         );
     }
 }
