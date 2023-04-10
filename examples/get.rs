@@ -1,4 +1,5 @@
 use clap::{Parser, Subcommand};
+use pinnacle::prelude::*;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -15,6 +16,8 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
+    /// Returns current balance
+    Balance,
     /// Returns sports
     Sports,
     /// Leagues in a particular sport
@@ -25,18 +28,23 @@ enum Command {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    use Command::*;
+
     dotenvy::dotenv().ok();
     let cli = Cli::parse();
-    let client = pinnacle::Client::new(cli.pinnacle_username, cli.pinnacle_password);
+    let client = PinnacleClient::new(cli.pinnacle_username, cli.pinnacle_password);
     match cli.command {
-        Command::Sports => {
-            println!("{:#?}", client.get_sports().await?)
+        Balance => {
+            println!("{:#?}", client.get(&GetClientBalance).await?)
         }
-        Command::Leagues { sport_id } => {
-            println!("{:#?}", client.get_sport_leagues(sport_id).await?)
+        Sports => {
+            println!("{:#?}", client.get(&GetSports).await?)
         }
-        Command::Periods { sport_id } => {
-            println!("{:#?}", client.get_sport_periods(sport_id).await?)
+        Leagues { sport_id } => {
+            println!("{:#?}", client.get(&GetLeagues { sport_id }).await?)
+        }
+        Periods { sport_id } => {
+            println!("{:#?}", client.get(&GetPeriods { sport_id }).await?)
         }
     }
     Ok(())

@@ -1,4 +1,4 @@
 /.env
+/examples/lab.rs
 /target
 Cargo.lock
-/src/bin/lab.rs

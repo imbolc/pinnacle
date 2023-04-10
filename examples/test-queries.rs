@@ -1,6 +1,7 @@
 //! Pinnacle Open API definition don't differentiate non optional respons fields.
 //! This test loops through sports to confirm my assumption about optional fields.
 use clap::Parser;
+use pinnacle::prelude::*;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -17,10 +18,10 @@ async fn main() -> anyhow::Result<()> {
     dotenvy::dotenv().ok();
 
     let cli = Cli::parse();
-    let client = pinnacle::Client::new(cli.pinnacle_username, cli.pinnacle_password);
+    let client = PinnacleClient::new(cli.pinnacle_username, cli.pinnacle_password);
 
     let sports: Vec<_> = client
-        .get_sports()
+        .get(&GetSports)
         .await?
         .sports
         .into_iter()
@@ -31,7 +32,7 @@ async fn main() -> anyhow::Result<()> {
     for (i, sport) in sports.iter().enumerate() {
         println!("{i} of {}", sports.len());
         let resp = client
-            .get_straight_odds(&pinnacle::types::StraightOddsRequest {
+            .get(&GetStraightOdds {
                 sport_id: sport.id,
                 ..Default::default()
             })

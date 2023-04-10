@@ -1,10 +1,9 @@
-//! Typed responses
-use crate::util;
+//! Typed Pinnacle API responses
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 /// Represents the balance details of a client.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ClientBalanceResponse {
     /// The amount available for betting.
@@ -18,7 +17,7 @@ pub struct ClientBalanceResponse {
 }
 
 /// Represents a sports response containing a list of sports.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SportsResponse {
     /// The list of sports.
@@ -26,7 +25,7 @@ pub struct SportsResponse {
 }
 
 /// Represents a sport.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Sport {
     /// The sport ID.
@@ -44,7 +43,7 @@ pub struct Sport {
 }
 
 /// Represents a leagues response containing a list of leagues.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Leagues {
     /// The list of leagues.
@@ -52,7 +51,7 @@ pub struct Leagues {
 }
 
 /// Represents a league.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct League {
     /// The league ID.
@@ -75,8 +74,15 @@ pub struct League {
     pub event_count: i32,
 }
 
+/// Periods
+#[derive(Debug, Deserialize, Serialize)]
+pub struct SportPeriods {
+    /// Periods
+    pub periods: Vec<SportPeriod>,
+}
+
 /// Represents a period for a sport.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SportPeriod {
     /// The period number.
@@ -107,59 +113,8 @@ pub struct SportPeriod {
     pub team2_total_short_description: String,
 }
 
-/// Periods
-#[derive(Debug, Deserialize, Serialize)]
-pub struct SportPeriods {
-    /// Periods
-    pub periods: Vec<SportPeriod>,
-}
-
-/// Format in which we return the odds
-#[derive(Debug, Deserialize, Serialize)]
-pub enum OddsFormat {
-    /// American
-    American,
-    /// Decimal
-    Decimal,
-    /// HongKong
-    HongKong,
-    /// Indonesian
-    Indonesian,
-    /// Malay
-    Malay,
-}
-
-/// Straight Odds request params
-#[derive(Debug, Default, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct StraightOddsRequest {
-    /// The sportid for which to retrieve the odds.
-    pub sport_id: i32,
-    /// The leagueIds array may contain a list of comma separated league ids
-    #[serde(serialize_with = "util::serialize_comma_separated_option")]
-    pub league_ids: Option<Vec<i32>>,
-    /// Format in which we return the odds. Default is American.
-    pub odds_format: Option<OddsFormat>,
-    /// This is used to receive incremental updates. Use the value of last from previous odds
-    /// response. When since parameter is not provided, the odds are delayed up to 1 min to
-    /// encourage the use of the parameter. Please note that when using since parameter you will
-    /// get in the response ONLY changed periods. If a period did not have any changes it will
-    /// not be in the response.
-    pub since: Option<i64>,
-    /// To retrieve ONLY live odds set the value to 1 (isLive=1).
-    /// Otherwise response will have all odds.
-    #[serde(serialize_with = "util::serialize_bool_1_or_skip")]
-    pub is_live: bool,
-    /// Filter by EventIds
-    #[serde(serialize_with = "util::serialize_comma_separated_option")]
-    pub event_ids: Option<Vec<i64>>,
-    /// 3 letter currency code as in the /currency response.
-    /// Limits will be returned in the requested currency. Default is USD.
-    pub to_currency_code: Option<String>,
-}
-
 /// Odds Response
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OddsResponse {
     /// Same as requested sport Id.
@@ -172,7 +127,7 @@ pub struct OddsResponse {
 }
 
 /// Odds League
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OddsLeague {
     /// League Id.
@@ -182,7 +137,7 @@ pub struct OddsLeague {
 }
 
 /// Odds Event
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OddsEvent {
     /// Event Id.
@@ -204,7 +159,7 @@ pub struct OddsEvent {
 }
 
 /// Odds Period
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OddsPeriod {
     /// Line Id.
@@ -254,7 +209,7 @@ pub struct OddsPeriod {
 }
 
 /// Odds Spread
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OddsSpread {
     /// This is present only if it's an alternative line.
@@ -271,7 +226,7 @@ pub struct OddsSpread {
 }
 
 /// Odds Moneyline
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OddsMoneyline {
     /// Away team price.
@@ -283,7 +238,7 @@ pub struct OddsMoneyline {
 }
 
 /// Odds Total
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OddsTotal {
     /// This is present only if it’s an alternative line.
@@ -300,7 +255,7 @@ pub struct OddsTotal {
 }
 
 /// Odds Team Totals
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OddsTeamTotals {
     /// Home team total points, over and under prices.
@@ -310,7 +265,7 @@ pub struct OddsTeamTotals {
 }
 
 /// Odds Team Total
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OddsTeamTotal {
     /// Total points.
@@ -319,33 +274,4 @@ pub struct OddsTeamTotal {
     pub over: f64,
     /// Under price.
     pub under: f64,
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_straight_odds_query() {
-        use serde_urlencoded::to_string as qs;
-
-        assert_eq!(qs(&StraightOddsRequest::default()).unwrap(), "sportId=0");
-        assert_eq!(
-            qs(&StraightOddsRequest {
-                is_live: true,
-                ..Default::default()
-            })
-            .unwrap(),
-            "sportId=0&isLive=1"
-        );
-        assert_eq!(
-            qs(&StraightOddsRequest {
-                league_ids: Some(vec![1, 2]),
-                odds_format: Some(OddsFormat::Decimal),
-                ..Default::default()
-            })
-            .unwrap(),
-            "sportId=0&leagueIds=1%2C2&oddsFormat=Decimal"
-        );
-    }
 }
