@@ -13,6 +13,8 @@ use std::result::Result as StdResult;
 pub mod types;
 mod util;
 
+use types::*;
+
 /// Pinnacle API client
 #[derive(Debug)]
 pub struct Client {
@@ -37,7 +39,6 @@ pub enum Error {
 
 /// Result
 pub type Result<T> = StdResult<T, Error>;
-type DeserializeJsonError = serde_path_to_error::Error<serde_json::Error>;
 
 impl Client {
     /// Creates a new client
@@ -67,46 +68,38 @@ impl Client {
         if text.is_empty() {
             return Err(Error::EmptyJson(url));
         }
-        parse_json(&text).map_err(|e| Error::DecodeJson(e, url))
+        util::parse_json(&text).map_err(|e| Error::DecodeJson(e, url))
     }
 
     /// Returns account balance
-    pub async fn get_balance(&self) -> Result<types::Balance> {
+    pub async fn get_balance(&self) -> Result<ClientBalanceResponse> {
         self.get("https://api.pinnacle.com/v1/client/balance").await
     }
 
     /// Returns all sports with the status whether they currently have lines or not
-    pub async fn get_sports(&self) -> Result<types::Sports> {
+    pub async fn get_sports(&self) -> Result<SportsResponse> {
         self.get("https://api.pinnacle.com/v2/sports").await
     }
 
     /// Returns all sports leagues with the status whether they currently have lines or not
-    pub async fn get_sport_leagues(&self, sport_id: i32) -> Result<types::Leagues> {
+    pub async fn get_sport_leagues(&self, sport_id: i32) -> Result<Leagues> {
         let url = format!("https://api.pinnacle.com/v2/leagues?sportId={sport_id}");
         self.get(url).await
     }
 
     /// Returns all periods for a given sport
-    pub async fn get_sport_periods(&self, sport_id: i32) -> Result<types::Periods> {
+    pub async fn get_sport_periods(&self, sport_id: i32) -> Result<SportPeriods> {
         let url = format!("https://api.pinnacle.com/v1/periods?sportId={sport_id}");
         self.get(url).await
     }
 
     /// Returns all periods for a given sport
     /// Usage: `client.get_straight_odds(&StraightOddsRequest {sport_id: 29, ..Default::default()}).await?`
-    pub async fn get_straight_odds(
-        &self,
-        request: &types::StraightOddsRequest,
-    ) -> Result<types::OddsResponse> {
+    pub async fn get_straight_odds(&self, request: &StraightOddsRequest) -> Result<OddsResponse> {
         let qs = serde_urlencoded::to_string(request)
             .ok()
             .unwrap_or_default();
         let url = format!("https://api.pinnacle.com/v1/odds?{qs}");
         self.get(url).await
     }
-}
-
-fn parse_json<T: DeserializeOwned>(json: &str) -> StdResult<T, DeserializeJsonError> {
-    let jd = &mut serde_json::Deserializer::from_str(json);
-    serde_path_to_error::deserialize(jd)
 }

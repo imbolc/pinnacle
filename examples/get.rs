@@ -18,15 +18,9 @@ enum Command {
     /// Returns sports
     Sports,
     /// Leagues in a particular sport
-    Leagues {
-        #[arg(short, long)]
-        sport_id: i32,
-    },
+    Leagues { sport_id: i32 },
     /// Periods in a particular sport
-    Periods {
-        #[arg(short, long)]
-        sport_id: i32,
-    },
+    Periods { sport_id: i32 },
 }
 
 #[tokio::main]

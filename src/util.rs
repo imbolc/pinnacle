@@ -1,3 +1,12 @@
+use serde::de::DeserializeOwned;
+
+type DeserializeJsonError = serde_path_to_error::Error<serde_json::Error>;
+
+pub(crate) fn parse_json<T: DeserializeOwned>(json: &str) -> Result<T, DeserializeJsonError> {
+    let jd = &mut serde_json::Deserializer::from_str(json);
+    serde_path_to_error::deserialize(jd)
+}
+
 pub(crate) fn serialize_comma_separated_option<T, S>(
     data: &Option<Vec<T>>,
     serializer: S,
