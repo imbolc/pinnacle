@@ -21,16 +21,30 @@ Here are all the currently wrapped [`requests`].
 ```rust,no_run
 use pinnacle::prelude::*;
 
-#[tokio::main]
-async fn main() {
    let client = PinnacleClient::new("pinnacle_user", "pinnacle_password");
    let req = GetStraightOdds {
        sport_id: 29,
        ..Default::default()
    };
-   let resp = client.get(&req).await.unwrap();
-   dbg!(resp);
-}
+   let odds = client.get(&req).await?;
+```
+
+You can also use a client that caches responses, which is helpful for development purposes:
+
+```rust,no_run
+use pinnacle::prelude::*;
+use std::time::Duration;
+
+   let client = PinnacleCachingClient::new(
+       "pinnacle_user",
+       "pinnacle_password",
+       "cache-folder",
+       Duration::from_secs(60 * 5),
+       );
+   let balance = client.get(&GetClientBalance).await?;
+   // Now, if you repeat the request within 5 minutes, the cached version will be used
+   // instead of making a new request.
+   let cached_balance = client.get(&GetClientBalance).await?;
 ```
 
 [api]: https://pinnacleapi.github.io/

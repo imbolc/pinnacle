@@ -3,7 +3,7 @@ use crate::{traits::PinnacleApiClient, util::parse_json};
 use async_trait::async_trait;
 use displaydoc::Display;
 use reqwest::IntoUrl;
-use serde::de::DeserializeOwned;
+use serde::{de::DeserializeOwned, Serialize};
 use std::marker::Send;
 use thiserror::Error;
 
@@ -50,9 +50,10 @@ impl PinnacleApiClient for PinnacleClient {
     async fn get_by_url<U, T>(&self, url: U) -> Result<T, Self::Error>
     where
         U: IntoUrl + Send,
-        T: DeserializeOwned,
+        T: DeserializeOwned + Serialize + Send,
     {
         let url = url.into_url()?;
+        println!("GET {url}");
         let text = self
             .reqwest_client
             .get(url.clone())

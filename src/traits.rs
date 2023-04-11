@@ -13,7 +13,7 @@ pub trait PinnacleApiRequest {
     const PATH: &'static str;
 
     /// The API response type
-    type Response: DeserializeOwned;
+    type Response: DeserializeOwned + Serialize + Send;
 }
 
 /// API Client
@@ -26,7 +26,7 @@ pub trait PinnacleApiClient {
     async fn get_by_url<U, T>(&self, url: U) -> Result<T, Self::Error>
     where
         U: IntoUrl + Send,
-        T: DeserializeOwned;
+        T: DeserializeOwned + Serialize + Send;
 
     /// Typed GET request
     async fn get<Q>(&self, query: &Q) -> Result<Q::Response, Self::Error>
@@ -34,7 +34,7 @@ pub trait PinnacleApiClient {
         Q: PinnacleApiRequest + Send + Serialize + Sync,
     {
         let qs = serde_urlencoded::to_string(query).ok().unwrap_or_default();
-        let url = format!("{API_ORIGIN}/{}?{qs}", Q::PATH);
+        let url = format!("{API_ORIGIN}{}?{qs}", Q::PATH);
         self.get_by_url(url).await
     }
 }

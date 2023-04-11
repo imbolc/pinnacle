@@ -1,3 +1,4 @@
+/.cache
 /.env
 /examples/lab.rs
 /target

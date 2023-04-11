@@ -2,6 +2,7 @@
 //! This test loops through sports to confirm my assumption about optional fields.
 use clap::Parser;
 use pinnacle::prelude::*;
+use pinnacle::util::error_chain;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -43,20 +44,4 @@ async fn main() -> anyhow::Result<()> {
         }
     }
     Ok(())
-}
-
-/// A helper to format error with its source chain
-pub fn error_chain(e: &impl std::error::Error) -> String {
-    use std::fmt::Write as _;
-
-    let mut s = e.to_string();
-    let mut current = e.source();
-    if current.is_some() {
-        s.push_str("\nCaused by:");
-    }
-    while let Some(cause) = current {
-        write!(s, "\n\t{}", cause).ok();
-        current = cause.source();
-    }
-    s
 }
