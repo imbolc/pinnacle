@@ -39,7 +39,7 @@ impl PinnacleCachingClient {
         }
     }
 
-    fn from_cache<T>(&self, url: &Url) -> Option<T>
+    fn get_cached<T>(&self, url: &Url) -> Option<T>
     where
         T: DeserializeOwned + Serialize,
     {
@@ -74,7 +74,7 @@ impl PinnacleApiClient for PinnacleCachingClient {
         T: DeserializeOwned + Serialize + Send,
     {
         let url = url.into_url()?;
-        let data = if let Some(data) = self.from_cache(&url) {
+        let data = if let Some(data) = self.get_cached(&url) {
             data
         } else {
             let data = self.client.get_by_url(url.clone()).await?;
@@ -133,15 +133,15 @@ fn url_to_filename(url: &Url) -> String {
     if let Some(path_segments) = url.path_segments() {
         for (i, segment) in path_segments.enumerate() {
             if i > 0 {
-                filename.push_str("_");
+                filename.push('_');
             }
-            filename.push_str(&segment);
+            filename.push_str(segment);
         }
     }
 
     if let Some(query) = url.query() {
-        filename.push_str("_");
-        filename.push_str(&query.replace("?", "").replace("&", "_").replace("=", "-"));
+        filename.push('_');
+        filename.push_str(&query.replace('?', "").replace('&', "_").replace('=', "-"));
     }
 
     filename
@@ -187,7 +187,7 @@ mod tests {
 
     #[test]
     fn test_file_modified_ago() {
-        assert!(file_modified_ago(&Path::new("Cargo.toml")).is_ok());
-        assert!(file_modified_ago(&Path::new("not-existing-file")).is_err());
+        assert!(file_modified_ago(Path::new("Cargo.toml")).is_ok());
+        assert!(file_modified_ago(Path::new("not-existing-file")).is_err());
     }
 }

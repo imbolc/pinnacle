@@ -111,7 +111,7 @@ mod tests {
     fn test_straight_odds_request() {
         use serde_urlencoded::to_string as qs;
 
-        assert_eq!(qs(&GetStraightOdds::default()).unwrap(), "sportId=0");
+        assert_eq!(qs(GetStraightOdds::default()).unwrap(), "sportId=0");
         assert_eq!(
             qs(&GetStraightOdds {
                 is_live: true,
