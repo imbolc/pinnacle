@@ -24,6 +24,8 @@ enum Command {
     Leagues { sport_id: i32 },
     /// Periods in a particular sport
     Periods { sport_id: i32 },
+    /// Fixtures for a particular sport
+    Fixtures { sport_id: i32 },
 }
 
 #[tokio::main]
@@ -45,6 +47,13 @@ async fn main() -> anyhow::Result<()> {
         }
         Periods { sport_id } => {
             println!("{:#?}", client.get(&GetPeriods { sport_id }).await?)
+        }
+        Fixtures { sport_id } => {
+            let req = GetFixtures {
+                sport_id,
+                ..Default::default()
+            };
+            println!("{:#?}", client.get(&req).await?)
         }
     }
     Ok(())

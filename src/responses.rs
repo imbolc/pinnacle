@@ -275,3 +275,77 @@ pub struct OddsTeamTotal {
     /// Under price.
     pub under: f64,
 }
+
+/// Represents the response from the /v1/fixtures endpoint.
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FixturesResponse {
+    /// Same as requested sport ID.
+    pub sport_id: i32,
+    /// Use this value for the subsequent requests for since query parameter to get just the changes
+    /// since previous response.
+    pub last: i64,
+    /// Contains a list of leagues.
+    pub league: Vec<FixturesLeague>,
+}
+
+/// Represents a league in the fixtures response.
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FixturesLeague {
+    /// League ID.
+    pub id: i32,
+
+    /// League name.
+    pub name: String,
+
+    /// Contains a list of events.
+    pub events: Vec<Fixture>,
+}
+
+/// Fixture object
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Fixture {
+    /// Event id.
+    pub id: i64,
+    /// If event is linked to another event, parentId will be populated.
+    /// Live event would have pre game event as parent id.
+    pub parent_id: Option<i64>,
+    /// Start time of the event in UTC.
+    pub starts: String,
+    /// Home team name.
+    pub home: String,
+    /// Away team name.
+    pub away: String,
+    /// Team1 rotation number. Please note that in the next version of /fixtures,
+    /// rotNum property will be decommissioned. ParentId can be used instead to group the related events.
+    pub rot_num: Option<String>,
+    /// Indicates live status of the event.
+    /// - 0 = No live betting will be offered on this event.
+    /// - 1 = Live betting event.
+    /// - 2 = Live betting will be offered on this match, but on a different event.
+    /// Please note that pre-game and live events are different.
+    pub live_status: i32,
+    /// Home team pitcher. Only for Baseball.
+    pub home_pitcher: Option<String>,
+    /// Away team pitcher. Only for Baseball.
+    pub away_pitcher: Option<String>,
+    /// This is deprecated parameter, please check period's `status` in the `/odds` endpoint to see if it's open for betting.
+    /// - O = This is the starting status of a game.
+    /// - H = This status indicates that the lines are temporarily unavailable for betting.
+    /// - I = This status indicates that one or more lines have a red circle (lower maximum bet amount).
+    pub status: Option<String>,
+    /// Parlay status of the event.
+    /// - 0 = Allowed to parlay, without restrictions.
+    /// - 1 = Not allowed to parlay this event.
+    /// - 2 = Allowed to parlay with the restrictions. You cannot have more than one leg from the same event in the parlay.
+    /// All events with the same rotation number are treated as same event.
+    pub parlay_restriction: i32,
+    /// Whether an event is offer with alternative teaser points. Events with alternative teaser points may vary from teaser definition.
+    pub alt_teaser: bool,
+    /// Specifies based on what the event will be resulted, e.g. Corners, Bookings.
+    pub resulting_unit: Option<String>,
+    /// Fixture version, goes up when there is a change in the fixture.
+    pub version: i64,
+}

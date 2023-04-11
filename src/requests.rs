@@ -103,6 +103,40 @@ impl PinnacleApiRequest for GetStraightOdds {
     type Response = OddsResponse;
 }
 
+/// Returns all **non-settled** events for the given sport. Please note that it is possible that
+/// the event is in Get Fixtures response but not in Get Odds. This happens when the odds are not
+/// currently available for wagering. Please note that it is possible to receive the same exact
+/// response when using **since** parameter. This is rare and can be caused by internal updates of
+/// event properties.
+#[derive(Debug, Default, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GetFixtures {
+    /// The ID of the sport to retrieve the fixtures for.
+    pub sport_id: i32,
+    /// An optional list of league IDs to filter the fixtures by.
+    #[serde(serialize_with = "serialize_comma_separated_option")]
+    pub league_ids: Option<Vec<i32>>,
+
+    /// An optional flag indicating whether to retrieve only live events.
+    pub is_live: Option<bool>,
+
+    /// An optional timestamp to receive incremental updates.
+    ///
+    /// This is used to receive incremental updates. Use the value of last from previous fixtures
+    /// response. When since parameter is not provided, the fixtures are delayed up to 1 minute to
+    /// encourage the use of the parameter.
+    pub since: Option<i64>,
+
+    /// An optional list of event IDs to filter the fixtures by.
+    #[serde(serialize_with = "serialize_comma_separated_option")]
+    pub event_ids: Option<Vec<i32>>,
+}
+
+impl PinnacleApiRequest for GetFixtures {
+    const PATH: &'static str = "/v1/fixtures";
+    type Response = FixturesResponse;
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
