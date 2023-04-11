@@ -17,13 +17,13 @@
 //!
 //! # #[tokio::main]
 //! # async fn main() -> Result<(), PinnacleClientError> {
-//!    let client = PinnacleClient::new("pinnacle_user", "pinnacle_password");
-//!    let req = GetStraightOdds {
-//!        sport_id: 29,
-//!        ..Default::default()
-//!    };
-//!    let odds = client.get(&req).await?;
-//! #  Ok(())
+//! let client = PinnacleClient::new("pinnacle_user", "pinnacle_password");
+//! let req = GetStraightOdds {
+//!     sport_id: 29,
+//!     ..Default::default()
+//! };
+//! let odds = client.get(&req).await?;
+//! # Ok(())
 //! # }
 //! ```
 //!
@@ -35,17 +35,17 @@
 //!
 //! # #[tokio::main]
 //! # async fn main() -> Result<(), PinnacleClientError> {
-//!    let client = PinnacleCachingClient::new(
-//!        "pinnacle_user",
-//!        "pinnacle_password",
-//!        "cache-folder",
-//!        Duration::from_secs(60 * 5),
-//!        );
-//!    let balance = client.get(&GetClientBalance).await?;
-//!    // Now, if you repeat the request within 5 minutes, the cached version will be used
-//!    // instead of making a new request.
-//!    let cached_balance = client.get(&GetClientBalance).await?;
-//! #  Ok(())
+//! let client = PinnacleCachingClient::new(
+//!     "pinnacle_user",
+//!     "pinnacle_password",
+//!     "cache-folder",
+//!     Duration::from_secs(60 * 5),
+//! );
+//! let balance = client.get(&GetClientBalance).await?;
+//! // Now, if you repeat the request within 5 minutes, the cached version will be used
+//! // instead of making a new request.
+//! let cached_balance = client.get(&GetClientBalance).await?;
+//! # Ok(())
 //! # }
 //! ```
 //!
