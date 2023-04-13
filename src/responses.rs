@@ -220,7 +220,7 @@ pub struct OddsSpread {
     pub home: f64,
     /// Away team price.
     pub away: f64,
-    /// Maximum bet volume. Present only on alternative lines, if set it overides `maxSpread`
+    /// Maximum bet volume. Present only on alternative lines, if set it overrides `maxSpread`
     /// market limit.
     pub max: Option<f64>,
 }

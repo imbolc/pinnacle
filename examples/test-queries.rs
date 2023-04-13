@@ -1,4 +1,4 @@
-//! Pinnacle Open API definition don't differentiate non optional respons fields.
+//! Pinnacle Open API definition don't differentiate non optional response fields.
 //! This test loops through sports to confirm my assumption about optional fields.
 use clap::Parser;
 use pinnacle::prelude::*;

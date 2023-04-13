@@ -170,7 +170,7 @@ fn file_modified_ago(path: &Path) -> Result<Duration, Box<dyn Error>> {
     let modified_since_epoch = modified.duration_since(SystemTime::UNIX_EPOCH)?;
     now_since_epoch
         .checked_sub(modified_since_epoch)
-        .ok_or("times missmatch".into())
+        .ok_or("times mismatch".into())
 }
 
 #[cfg(test)]
