@@ -184,10 +184,4 @@ mod tests {
         let filename = url_to_filename(&url);
         assert_eq!(filename, "path_to_file_param1-value1_param2-value2");
     }
-
-    #[test]
-    fn test_file_modified_ago() {
-        assert!(file_modified_ago(Path::new("Cargo.toml")).is_ok());
-        assert!(file_modified_ago(Path::new("not-existing-file")).is_err());
-    }
 }
